@@ -10,9 +10,13 @@ def predict(sk_id_curr):
     """
     response = requests.post(API_URL, json={'SK_ID_CURR': sk_id_curr})
     if response.status_code == 200:
-        return response.json()['Dossier']
+        result = response.json()
+        dossier = result.get('Dossier')
+        probabilite = result.get('Probabilite')
+        seuil = result.get('Seuil')
+        return dossier, probabilite, seuil
     else:
-        return 'Erreur: Identifiant client non trouvé'
+        return 'Erreur: Identifiant client non trouvé', None, None
 
 # Début de l'application Streamlit
 st.title('Analyse de dossier crédit')
@@ -22,5 +26,6 @@ sk_id_curr = st.number_input('Entrez l\'ID client', format="%.0f")
 
 # Bouton pour effectuer la prédiction
 if st.button('Analyse du dossier'):
-    dossier = predict(sk_id_curr)
+    dossier, probabilite, seuil = predict(sk_id_curr)
     st.write(dossier)
+    st.write(f'Probabilité de défaut : {probabilite} (seuil : {seuil})')
